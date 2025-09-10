@@ -1,0 +1,45 @@
+data_path: "../kaggle/input/train/static/ExperimentRuns/"
+mask_path: "../kaggle/working/overlay/ExperimentRuns/"
+output_dir: "../kaggle/working/output/"
+
+train_bs: 2
+valid_bs: 2
+workers: 1
+
+progress_bar_refresh_rate: 1
+
+save_topk: 30
+
+early_stop:
+    monitor: "val_loss"
+    mode: "min"
+    patience: 999
+    verbose: 1
+
+trainer:
+    max_epochs: 20
+    min_epochs: 20
+    enable_progress_bar: True
+    precision: "16-mixed"
+    devices: 1
+
+model:
+    name: "eff"
+    loss_smooth: 0.0
+    optimizer_params:
+        lr: 0.001
+        #lr: 0.00007
+        weight_decay: 0.0001
+    scheduler:
+        #name: "CosineAnnealingLR"
+        name: "cosine_with_warmup"
+        params:
+            CosineAnnealingLR:
+                T_max: 30
+                eta_min: 5.0e-4
+                last_epoch: -1
+            cosine_with_warmup:
+                num_training_steps: 30
+                num_warmup_steps: 1
+                num_cycles: 0.5
+                last_epoch: -1

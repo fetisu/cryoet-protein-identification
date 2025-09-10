@@ -1,0 +1,7 @@
+[core]
+    remote = fetgdrive
+    autostage = true
+['remote "fetgdrive"']
+    url = gdrive://15twnJwjf52jmu2KniewNRkoSq-6D9rZU
+    gdrive_client_id = 928612368581-7rabrpdiikddiil4p4cbhv8t5u24skk1.apps.googleusercontent.com
+    gdrive_client_secret = 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
