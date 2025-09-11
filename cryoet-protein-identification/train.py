@@ -93,7 +93,7 @@ class CZIIModule(pl.LightningModule):
         else:
             return {"optimizer": optimizer}
 
-    def training_step(self, config, batch, batch_idx):
+    def training_step(self, batch, batch_idx):
         volume, mask, _, _, _, _ = batch
         preds = self.model.forward(volume)
         loss = self.loss_module(preds, mask)
@@ -103,7 +103,7 @@ class CZIIModule(pl.LightningModule):
             on_step=True,
             on_epoch=True,
             prog_bar=True,
-            batch_size=config["train_bs"],
+            batch_size=2,
         )
         for param_group in self.trainer.optimizers[0].param_groups:
             lr = param_group["lr"]
@@ -275,7 +275,6 @@ def main(config: DictConfig):
         p + "Picks/"
         for p in glob("../kaggle/input/train/overlay/ExperimentRuns/*/")
     ]
-    pickable_obj_path_list
     for pickable_obj_path in pickable_obj_path_list:
         path_list = glob(pickable_obj_path + "*.json")
         for path in path_list:
