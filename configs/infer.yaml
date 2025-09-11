@@ -1,0 +1,11 @@
+debug: False
+data_path: "../kaggle/input/test/static/ExperimentRuns/"
+bs: 2
+progress_bar_refresh_rate: 1
+model_path_list: [
+        '../kaggle/working/output/_convnext-window_32_320_320-pre_ds-r5n5n33n33n33-4tta-bce-30e-all-v29.ckpt',
+        '../kaggle/working/output/_convnext-window_32_320_320-pre_ds-r5n5n33n33n33-4tta-bce-30e-all-v28.ckpt',
+        '../kaggle/working/output/_convnext-window_32_320_320-pre_ds-r5n5n33n33n33-4tta-bce-30e-all-v27.ckpt',
+        '../kaggle/working/output/_convnext-window_32_320_320-pre_ds-r5n5n33n33n33-4tta-bce-30e-all-v26.ckpt',
+    ]
+thresholds: [0.28333333, 0.15833333, 0.19166667, 0.1       , 0.25      ]

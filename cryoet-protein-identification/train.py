@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import gc
 import json
-import os
-import random
 from glob import glob
 
 import hydra
@@ -12,6 +10,7 @@ import pytorch_lightning as pl
 import torch
 import transformers
 import wandb
+from constants import exp_name, hydra_config_path, wandb_filename
 from dataset import CZIIDataset
 from eval_loss import BCEDiceLoss, np_find_centroid, np_find_component, score
 from omegaconf import DictConfig
@@ -21,20 +20,6 @@ from threed_models import UNet3D
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import DataLoader
-from utils import exp_name, hydra_config_path
-from utils import seed as SEED
-from utils import wandb_filename
-
-
-def seed_everything(seed):
-    random.seed(seed)
-    os.environ["PYTHONHASHSEED"] = str(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.backends.cudnn.deterministic = (
-        True  # Fix the network according to random seed
-    )
 
 
 class CZIIModule(pl.LightningModule):
@@ -76,12 +61,6 @@ class CZIIModule(pl.LightningModule):
             lr_scheduler_dict = {"scheduler": scheduler, "interval": "step"}
             return {"optimizer": optimizer, "lr_scheduler": lr_scheduler_dict}
         elif self.config["model"]["scheduler"]["name"] == "cosine_with_warmup":
-            print("cosine with warmup")
-            print(
-                self.config["model"]["scheduler"]["params"][
-                    "cosine_with_warmup"
-                ]
-            )
             scheduler = transformers.get_cosine_schedule_with_warmup(
                 optimizer,
                 **self.config["model"]["scheduler"]["params"][
@@ -295,7 +274,6 @@ def main(config: DictConfig):
     df = df[["experiment", "particle_type", "x", "y", "z"]]
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    seed_everything(SEED)
     torch.set_float32_matmul_precision("medium")
 
     df["fold"] = 3
@@ -323,8 +301,6 @@ def main(config: DictConfig):
         valid_obj_mapper = {
             exp: i for i, exp in enumerate(valid_df.experiment.unique())
         }
-        print("train_obj_mapper! ", train_obj_mapper)
-        print("valid_obj_mapper! ", valid_obj_mapper)
         dataset_train = CZIIDataset(
             config["data_path"],
             config["mask_path"],
@@ -339,8 +315,6 @@ def main(config: DictConfig):
             valid_obj_mapper,
             "valid",
         )
-        print("dataset_train! ", dataset_train)
-        print("dataset_validation! ", dataset_validation)
         data_loader_train = DataLoader(
             dataset_train,
             batch_size=config["train_bs"],

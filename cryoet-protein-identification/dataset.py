@@ -5,9 +5,9 @@ import numpy as np
 import pandas as pd
 import torch
 import zarr
+from constants import data_path_name, seg_path_name
 from rotate_flip import random_flip_3d, random_intensity_shift, rotate_90_3d
 from torch.utils.data import Dataset
-from utils import data_path_name, seg_path_name
 
 
 class CZIIDataset(Dataset):

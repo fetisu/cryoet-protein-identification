@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
+from constants import particle_radius, particle_weights
 from scipy.spatial import KDTree
-from utils import particle_radius, particle_weights
 
 
 def f_score(pr, gt, beta=4, eps=1e-7, threshold=None, activation="sigmoid"):
@@ -173,7 +173,7 @@ def score(
       - individual f_beta scores are weighted by particle type for final score
     """
 
-    particle_radius = {
+    particle_radius_multiplied = {
         k: v * distance_multiplier for k, v in particle_radius.items()
     }
 
@@ -190,7 +190,7 @@ def score(
         raise ParticipantVisibleError("Unrecognized `particle_type`.")
 
     assert solution.duplicated(subset=["experiment", "x", "y", "z"]).sum() == 0
-    assert particle_radius.keys() == particle_weights.keys()
+    assert particle_radius_multiplied.keys() == particle_weights.keys()
 
     results = {}
     for particle_type in solution["particle_type"].unique():
@@ -202,7 +202,7 @@ def score(
 
     for experiment in split_experiments:
         for particle_type in solution["particle_type"].unique():
-            reference_radius = particle_radius[particle_type]
+            reference_radius = particle_radius_multiplied[particle_type]
             select = (solution["experiment"] == experiment) & (
                 solution["particle_type"] == particle_type
             )

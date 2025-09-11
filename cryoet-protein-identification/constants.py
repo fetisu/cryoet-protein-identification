@@ -48,9 +48,17 @@ particle_weights = {
 }
 
 # train
-seed = 424242
 hydra_config_path = "../configs"
 exp_name = ["TS_69_2", "TS_86_3", "TS_73_6"]
 wandb_filename = (
     "_convnext-window_32_320_320-pre_ds-r5n5n33n33n33-4tta-bce-30e-all"
 )
+
+# infer
+infer_particles = [
+    "apo-ferritin",
+    "beta-galactosidase",
+    "ribosome",
+    "thyroglobulin",
+    "virus-like-particle",
+]

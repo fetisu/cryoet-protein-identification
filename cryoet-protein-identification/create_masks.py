@@ -5,9 +5,7 @@ from collections import defaultdict
 import copick
 import copick_utils.writers.write as write
 import numpy as np
-from copick_utils.segmentation import segmentation_from_picks
-from tqdm import tqdm
-from utils import (
+from constants import (
     copick_config_path,
     copick_segmentation_name,
     copick_user_name,
@@ -16,6 +14,8 @@ from utils import (
     source_dir,
     tomo_type,
 )
+from copick_utils.segmentation import segmentation_from_picks
+from tqdm import tqdm
 
 
 def walk_through_train_data():
