@@ -84,7 +84,7 @@ As there were some troubles with downloading the dataset from the kaggle using c
 
 ## 📸 Screenshots
 
-todo
+Sample wandb report can be found (and i hope publically accesd by anyone) here: https://api.wandb.ai/links/fetveta-org/vl5oed40
 
 ## 📝 License
 
