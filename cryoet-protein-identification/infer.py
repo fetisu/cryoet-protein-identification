@@ -6,24 +6,25 @@ import cc3d
 import hydra
 import numpy as np
 import pandas as pd
-import pytorch_lightning as pl
 import torch
-import zarr
-from constants import hydra_config_path, infer_particles, particle_radius
+from constants import (
+    COOR_LIST,
+    PATCH_D,
+    PATCH_H,
+    PATCH_W,
+    hydra_config_path,
+    infer_particles,
+    particle_radius,
+)
 
 # from eval_loss import score
 from joblib import Parallel, delayed
+from module_dataset import CZIIDataset, CZIIModule
 from omegaconf import DictConfig
 from sklearn.cluster import DBSCAN
-from threed_models import UNet3D
 
 # from torch.optim import Adam, AdamW
-from torch.utils.data import DataLoader, Dataset
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-PATCH_D = 32
-PATCH_H = 320
-PATCH_W = 320
+from torch.utils.data import DataLoader
 
 
 def calc_centroid(pred_temp):
@@ -33,80 +34,10 @@ def calc_centroid(pred_temp):
     return np.ascontiguousarray(zyx[:, ::-1]) * 10.012444
 
 
-class CZIIDataset(Dataset):
-    def __init__(self, coor_list, data_path, obj, usage="sub"):
-        self.obj = obj
-        self.data_path = data_path
-        self.usage = usage
-        self.coor_list = coor_list
-        self.voxel = np.zeros((184, 630, 630), dtype=np.float32)
-
-        self.voxel[:, :, :] = self.normalize_numpy(
-            zarr.open(data_path + obj + "/VoxelSpacing10.000/denoised.zarr")[
-                "0"
-            ][:]
-        )
-
-    def __getitem__(self, index):
-        row = self.coor_list[index]
-        x = row[0]
-        y = row[1]
-        z = row[2]
-
-        if z > 184 - PATCH_D:
-            z = 184 - PATCH_D
-        if x > 630 - PATCH_W:
-            x = 630 - PATCH_W
-        if y > 630 - PATCH_H:
-            y = 630 - PATCH_H
-        data = self.voxel[z : z + PATCH_D, y : y + PATCH_H, x : x + PATCH_W]
-        data = torch.tensor(data, dtype=torch.float32)
-
-        return (
-            data.unsqueeze(0),
-            torch.tensor(x),
-            torch.tensor(y),
-            torch.tensor(z),
-        )
-
-    def normalize_numpy(self, x):
-        lower, upper = np.percentile(x, (1, 99))
-        x = np.clip(x, lower, upper)
-        x = x - np.min(x)
-        x = x / np.max(x)
-        return x
-
-    def __len__(self):
-        return len(self.coor_list)
-
-
-class CZIIModule(pl.LightningModule):
-    def __init__(self, config):
-        super().__init__()
-        self.config = config
-        self.model = UNet3D(in_channels=1, out_channels=5)
-
-    def forward(self, batch):
-        preds = self.model(batch)
-        return preds
-
-
 @hydra.main(
     version_base=None, config_path=hydra_config_path, config_name="infer"
 )
 def main(config: DictConfig):
-    COOR_LIST = []
-    for x in range(630 // PATCH_W + 1):
-        for y in range(630 // PATCH_H + 1):
-            for z in range(184 // PATCH_D + 2):
-                COOR_LIST.append(
-                    [
-                        x * PATCH_W - 10 * x,
-                        y * PATCH_H - 10 * y,
-                        z * PATCH_D - 6 * z,
-                    ]
-                )
-
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     threshold = torch.tensor(config["thresholds"], device=device).reshape(
         5, 1, 1, 1

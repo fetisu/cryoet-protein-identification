@@ -1,26 +1,4 @@
 # -*- coding: utf-8 -*-
-from pathlib import Path
-
-# create_masks
-# paths
-source_dir = Path("../kaggle/input/train/overlay")
-destination_dir = Path("../kaggle/working/overlay")
-copick_config_path = Path("../kaggle/working/copick.config")
-
-# copick
-copick_user_name = "copickUtils"
-copick_segmentation_name = "paintedPicks"
-voxel_size = 10
-tomo_type = "denoised"
-
-# scales
-particle_scales = {
-    "apo-ferritin": 1 / 2,
-    "beta-galactosidase": 1 / 2,
-    "ribosome": 1 / 3,
-    "thyroglobulin": 1 / 3,
-    "virus-like-particle": 1 / 3,
-}
 
 # dataset
 # paths
@@ -62,3 +40,18 @@ infer_particles = [
     "thyroglobulin",
     "virus-like-particle",
 ]
+PATCH_D = 32
+PATCH_H = 320
+PATCH_W = 320
+
+COOR_LIST = []
+for x in range(630 // PATCH_W + 1):
+    for y in range(630 // PATCH_H + 1):
+        for z in range(184 // PATCH_D + 2):
+            COOR_LIST.append(
+                [
+                    x * PATCH_W - 10 * x,
+                    y * PATCH_H - 10 * y,
+                    z * PATCH_D - 6 * z,
+                ]
+            )

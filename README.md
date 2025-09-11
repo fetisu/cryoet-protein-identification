@@ -29,6 +29,16 @@ As there were some troubles with downloading the dataset from the kaggle using c
 *   **Optimizer:** `AdamW`
 *   **Learning Rate Scheduler:** `CosineAnnealingLR`
 
+## Data Formats and Storage
+
+* Cryo-ET volumes and segmentation masks are stored in Zarr format.
+* kaggle/input directory contains everything from the original kaggle dataset fro convinience as cli kaggle download timeouted this dataset
+* inference results are a csv file with specified from the kaggle competition format, example can be found kaggle/input/sample_submission.csv
+* generate_masks command creates masks (aka spheras on 3d tomograms) to be interpreted as protein particles from the input picks xy and radius aand are stored in working/overlay/
+* model checpoints would be located by default in kaggle/working/output
+* there is a convert_to_onnx command to create a model export in onnx format at kaggle/working/output/model.onnx by default
+
+
 ## 📦 Getting Started
 
 ### Preparation
@@ -54,46 +64,27 @@ As there were some troubles with downloading the dataset from the kaggle using c
 
 ### Running
 
-1.  **Configure the training parameters:**
-    Modify the `configs/train.yaml` file to suit your needs.  Adjust data paths, batch sizes, and other training parameters as necessary.
+1.  **Configure configs:**
+    Modify the `configs/train.yaml` file to suit your needs if necessary.
+    Modify the `configs/infer.yaml` file to suit your needs if necessary.
+    Adjust data paths, batch sizes, and other training parameters as necessary.
 
-2.  **Start the training process:**
+2.  **All commands are accesible through command.py:**
+
+    generate_masks to generate masks from input data (if you would like to adjust radius scales for diffrent particles, default masks are already stored in dvc remote)
+
+    vizualize_masks to gain better understanding of what's going on
+
+    train, infer and convert_to_onnx
 
     ```bash
-    poetry run python3 train.py
+    poetry run python3 commands.py train
     ```
 
-3. **Configure the inference parameters:**
-    Modify the `configs/infer.yaml` file to suit your needs and run it!
-    Note that it uses models from checkpoints.
-
-3. **Inference:**
-    ```bash
-    poetry run python3 infer.py
-    ```
-
-
-## 📂 Project Structure
-
-```
-cryoet-protein-identification/
-├── configs/
-│   └── train.yaml          # Training configuration file
-├── cryoet-protein-identification/
-│   ├── dataset.py          # Dataset class for loading and preprocessing data
-│   ├── eval_loss.py        # Loss functions and evaluation metrics
-│   ├── infer.py            # Inference script (currently empty)
-│   ├── rotate_flip.py      # Data augmentation functions
-│   ├── threed_models.py    # 3D neural network architectures
-│   ├── train.py            # Training script
-│   └── utils.py            # Utility functions and constants
-├── README.md             # This file
-└── requirements.txt      # Project dependencies (example)
-```
 
 ## 📸 Screenshots
 
-
+todo
 
 ## 📝 License
 

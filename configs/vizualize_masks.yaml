@@ -1,0 +1,9 @@
+
+source_dir: Path("../kaggle/input/train/overlay")
+destination_dir: Path("../kaggle/working/overlay")
+copick_config_path: "../kaggle/working/copick.config"
+
+copick_user_name: "copickUtils"
+copick_segmentation_name: "paintedPicks"
+voxel_size: 10
+tomo_type: "denoised"

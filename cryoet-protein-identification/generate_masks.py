@@ -1,27 +1,20 @@
 # -*- coding: utf-8 -*-
 import shutil
 from collections import defaultdict
+from pathlib import Path
 
 import copick
 import copick_utils.writers.write as write
 import numpy as np
-from constants import (
-    copick_config_path,
-    copick_segmentation_name,
-    copick_user_name,
-    destination_dir,
-    particle_scales,
-    source_dir,
-    tomo_type,
-)
 from copick_utils.segmentation import segmentation_from_picks
+from omegaconf import DictConfig
 from tqdm import tqdm
 
 
-def walk_through_train_data():
-    for root, _dirs, files in source_dir.walk():
-        relative_path = root.relative_to(source_dir)
-        target_dir = destination_dir / relative_path
+def walk_through_train_data(config: DictConfig):
+    for root, _dirs, files in Path(config["source_dir"]).walk():
+        relative_path = root.relative_to(Path(config["source_dir"]))
+        target_dir = Path(config["destination_dir"]) / relative_path
         target_dir.mkdir(parents=True, exist_ok=True)
 
         for file in files:
@@ -31,13 +24,15 @@ def walk_through_train_data():
                 new_filename = f"curation_0_{file}"
 
             source_file = root / file
-            destination_file = destination_dir / relative_path / new_filename
+            destination_file = (
+                Path(config["destination_dir"]) / relative_path / new_filename
+            )
 
             shutil.copy2(source_file, destination_file)
 
 
-def generate_masks():
-    root = copick.from_file(copick_config_path)
+def generate_masks(config: DictConfig):
+    root = copick.from_file(Path(config["copick_config_path"]))
     target_objects = defaultdict(dict)
 
     for object in root.pickable_objects:
@@ -48,14 +43,14 @@ def generate_masks():
     for run in tqdm(root.runs):
         print(run)
         tomo = run.get_voxel_spacing(10)
-        tomo = tomo.get_tomogram(tomo_type).numpy()
+        tomo = tomo.get_tomogram(config["tomo_type"]).numpy()
         target = np.zeros(tomo.shape, dtype=np.uint8)
         for pickable_object in root.pickable_objects:
             pick = run.get_picks(
                 object_name=pickable_object.name, user_id="curation"
             )
             if len(pick):
-                scale = particle_scales[pick[0].pickable_object_name]
+                scale = config["particle_scales"][pick[0].pickable_object_name]
 
                 target = segmentation_from_picks.from_picks(
                     pick[0],
@@ -64,5 +59,17 @@ def generate_masks():
                     target_objects[pickable_object.name]["label"],
                 )
         write.segmentation(
-            run, target, copick_user_name, name=copick_segmentation_name
+            run,
+            target,
+            config["copick_user_name"],
+            name=config["copick_segmentation_name"],
         )
+
+
+def main(config: DictConfig):
+    walk_through_train_data(config)
+    generate_masks(config)
+
+
+if __name__ == "__main__":
+    main()

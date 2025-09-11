@@ -1,0 +1,17 @@
+
+source_dir: "../kaggle/input/train/overlay"
+destination_dir: "../kaggle/working/overlay"
+copick_config_path: "../kaggle/working/copick.config"
+
+copick_user_name: "copickUtils"
+copick_segmentation_name: "paintedPicks"
+voxel_size: 10
+tomo_type: "denoised"
+
+particle_scales: {
+    "apo-ferritin": 1 / 2,
+    "beta-galactosidase": 1 / 2,
+    "ribosome": 1 / 3,
+    "thyroglobulin": 1 / 3,
+    "virus-like-particle": 1 / 3,
+}

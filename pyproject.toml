@@ -27,6 +27,7 @@ traitlets = "^5.14.3"
 albumentations = "^2.0.8"
 transformers = "^4.56.1"
 wandb = "^0.21.3"
+onnx = "^1.19.0"
 
 
 [tool.poetry.group.dev.dependencies]
