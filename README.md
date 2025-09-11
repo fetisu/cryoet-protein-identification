@@ -4,6 +4,8 @@ This project focuses on identifying and segmenting proteins in cryo-electron tom
 
 This is a modified copy in terms of code of the notebook of the 9th place kaggle competition solution with small steps towards understanding MLOps and how projects should be organised and managed.
 
+The solution https://www.kaggle.com/competitions/czii-cryo-et-object-identification/writeups/avengers-9th-place-solution
+
 The aim of the project is to train the model and then to create 'submissions.csv' file with test results in the format that was expected in the kaggle competition.
 
 As there were some troubles with downloading the dataset from the kaggle using cli, the dataset was uploaded to a google drive via dvc remote.
